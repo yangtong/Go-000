@@ -28,7 +28,7 @@ func main() {
 		WriteTimeout: time.Second * 5,
 		Handler:      mux,
 	}
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		fmt.Println("starting signal goroutine")
@@ -45,8 +45,23 @@ func main() {
 
 			case <-quit:
 				cancel()
+
+				return
+			}
+		}
+	}()
+
+	go func() {
+		fmt.Println("starting stop goroutine")
+		defer wg.Done()
+		for {
+			select {
+			case <-ctx.Done():
+                fmt.Println("http stop ctx done")
 				err := server.Shutdown(ctx)
-				fmt.Println(err)
+				if err != nil {
+					fmt.Println(err)
+				}
 				return
 			}
 		}

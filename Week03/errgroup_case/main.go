@@ -41,11 +41,7 @@ func main() {
 			case <-ctx.Done():
 				return ctx.Err()
 			case <-quit:
-				err := server.Shutdown(ctx)
-				if err != nil {
-					return err
-				}
-				return errors.New("quit")
+				return errors.New("quit by signal")
 			}
 		}
 	})
@@ -74,6 +70,21 @@ func main() {
 			}
 		}
 	})
+
+    group.Go(func() error {
+        fmt.Println("starting stop http goroutine")
+        for {
+            select {
+            case <-ctx.Done():
+                fmt.Println("stop http ctx done")
+                err := server.Shutdown(ctx)
+                if err != nil {
+                    return err
+                }
+                return nil
+            }
+        }
+    })
 
 	err := group.Wait()
 	if err == nil {
