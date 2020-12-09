@@ -23,11 +23,19 @@ func main() {
 	})
 
 	group.Go(func() error {
+		return runner.DebugHttpRoutine()
+	})
+
+	group.Go(func() error {
 		return runner.BizRoutine(ctx)
 	})
 
 	group.Go(func() error {
 		return runner.StopRoutine(ctx)
+	})
+
+	group.Go(func() error {
+		return runner.StopDebugRoutine(ctx)
 	})
 
 	err := group.Wait()

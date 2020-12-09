@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,7 +13,8 @@ import (
 )
 
 type Runner struct {
-	Server *http.Server
+	Server      *http.Server
+	DebugServer *http.Server
 }
 
 func NewRunner() *Runner {
@@ -25,8 +27,15 @@ func NewRunner() *Runner {
 		Handler:      mux,
 	}
 
+	debugServer := &http.Server{
+		Addr:         "127.0.0.1:8081",
+		WriteTimeout: time.Second * 5,
+		Handler:      http.DefaultServeMux,
+	}
+
 	return &Runner{
-		Server: server,
+		Server:      server,
+		DebugServer: debugServer,
 	}
 }
 
@@ -60,17 +69,25 @@ func (r *Runner) HttpRoutine() error {
 	return nil
 }
 
+func (r *Runner) DebugHttpRoutine() error {
+	fmt.Println("starting debug http server")
+	err := r.DebugServer.ListenAndServe()
+	if err != nil {
+		fmt.Println("debug http server done, err: ", err)
+		return err
+	}
+	return nil
+}
+
 func (r *Runner) BizRoutine(ctx context.Context) error {
 	fmt.Println("starting biz goroutine")
-	for {
-		ticker := time.NewTicker(5 * time.Second)
+	for {		
 		select {
 		case <-ctx.Done():
 			fmt.Println("biz ctx done")
 			return ctx.Err()
-		case <-ticker.C:
+		case <-time.After(time.Second * 5):
 			fmt.Println("biz sleep 5s")
-			return nil
 		}
 	}
 }
@@ -82,6 +99,21 @@ func (r *Runner) StopRoutine(ctx context.Context) error {
 		case <-ctx.Done():
 			fmt.Println("stop http ctx done")
 			err := r.Server.Shutdown(ctx)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+}
+
+func (r *Runner) StopDebugRoutine(ctx context.Context) error {
+	fmt.Println("starting stop debug http goroutine")
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("stop debug http ctx done")
+			err := r.DebugServer.Shutdown(ctx)
 			if err != nil {
 				return err
 			}
