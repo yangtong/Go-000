@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"learn/Go-000/Week03/errgroup_case"
+	"github.com/yangtong/Go-000/Week03/errgroup_case"
 
 	"golang.org/x/sync/errgroup"
 )

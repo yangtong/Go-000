@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"learn/Go-000/Week03/waitgroup_case"
+	"github.com/yangtong/Go-000/Week03/waitgroup_case"
 )
 
 func main() {

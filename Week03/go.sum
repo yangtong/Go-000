@@ -1,0 +1,3 @@
+github.com/yangtong/Go-000 v0.0.0-20201210074552-a61ac32bccec h1:vxbcZGzqyMKyKYOOHImgikIbeM4vQyIJy3zytZcktFk=
+golang.org/x/sync v0.0.0-20201207232520-09787c993a3a h1:DcqTD9SDLc+1P/r1EmRBwnVsrOwW+kk2vWf9n+1sGhs=
+golang.org/x/sync v0.0.0-20201207232520-09787c993a3a/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
